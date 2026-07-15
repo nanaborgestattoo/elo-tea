@@ -355,6 +355,124 @@
   footer{
     max-width:1180px;margin:0 auto;padding:1.4em 1.2em 3em;color:var(--ink-soft);font-size:.82rem;
   }
+  /* ===== NOVOS COMPONENTES: login, receitas, comentários, depoimentos, atividades ===== */
+.login-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+.login-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.login-btn {
+  background: none;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: 4px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.login-btn:hover {
+  background: var(--primary);
+  color: var(--surface);
+}
+.login-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.login-modal.active {
+  display: flex;
+}
+.login-content {
+  background: var(--surface);
+  padding: 24px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.recipe-grid, .activity-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+@media (min-width: 520px) {
+  .recipe-grid, .activity-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (min-width: 820px) {
+  .recipe-grid, .activity-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+.recipe-card, .activity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.recipe-meta {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+.comment-item {
+  background: var(--bg);
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+}
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  background: var(--surface);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-light);
+  background: var(--bg);
+  border-radius: 12px;
+  margin-top: 16px;
+}
 </style>
 </head>
 <body>
@@ -364,15 +482,17 @@
 <header class="site-header">
   <div class="header-inner">
     <a href="#" class="logo"><span class="logo-badge" aria-hidden="true">🧩</span> Elo TEA</a>
-    <nav class="tabs" aria-label="Navegação principal">
-      <button data-tab="home" class="active">Início</button>
-      <button data-tab="biblioteca">Biblioteca</button>
-      <button data-tab="comunicacao">Comunicação</button>
-      <button data-tab="rotina">Rotina</button>
-      <button data-tab="treinos">Treinos</button>
-      <button data-tab="perfil">Perfil</button>
-      <button data-tab="blog">Blog</button>
-    </nav>
+    <div class="login-bar" id="login-bar">
+  <!-- Preenchido via JS -->
+</div>
+  <nav class="tabs">
+  <button class="tab active" data-tab="home">Início</button>
+  <button class="tab" data-tab="rotina">Rotina</button>
+  <button class="tab" data-tab="alimentacao">Alimentação</button>
+  <button class="tab" data-tab="atividades">Atividades</button>
+  <button class="tab" data-tab="treinos">Treinos</button>
+  <button class="tab" data-tab="perfil">Perfil</button>
+</nav>
   </div>
 </header>
 
@@ -482,7 +602,116 @@
     </div>
     <div id="modules-wrap"></div>
   </section>
+<!-- ============ ALIMENTAÇÃO ============ -->
+  <section class="view" id="view-alimentacao">
+    <div class="view-head">
+      <span class="eyebrow">Alimentação</span>
+      <h2>Seletividade e Receitas</h2>
+      <p>Estratégias e receitas nutritivas para lidar com a seletividade alimentar, respeitando o perfil sensorial.</p>
+    </div>
 
+    <div class="card" style="margin-bottom: 1.4em;">
+      <h3 style="font-size: 1.1rem;">Sobre a Seletividade Alimentar</h3>
+      <p id="seletividade-texto" style="font-size: 0.95rem; color: var(--ink-soft);"></p>
+      <div class="accordion" id="acc-seletividade"></div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1em; margin-bottom: 1em;">
+        <h3 style="margin: 0;">Receitas Compartilhadas</h3>
+        <button class="btn small" id="btn-nova-receita" style="display: none;">+ Nova Receita</button>
+      </div>
+
+      <div class="caa-tabs" id="receitas-filtros"></div>
+
+      <div id="form-nova-receita" style="display: none; background: var(--surface-2); padding: 1em; border-radius: var(--radius-md); margin-bottom: 1em;">
+        <h4 style="margin-top: 0;">Adicionar Receita</h4>
+        <div class="field">
+          <label for="rec-titulo">Título da Receita</label>
+          <input type="text" id="rec-titulo" placeholder="Ex: Panqueca de Banana">
+        </div>
+        <div class="field">
+          <label for="rec-categoria">Categoria</label>
+          <select id="rec-categoria"></select>
+        </div>
+        <div class="field">
+          <label for="rec-ingredientes">Ingredientes (um por linha)</label>
+          <textarea id="rec-ingredientes" rows="4" placeholder="Ex: 1 banana&#10;1 ovo&#10;2 colheres de aveia"></textarea>
+        </div>
+        <div class="field">
+          <label for="rec-preparo">Modo de Preparo (um passo por linha)</label>
+          <textarea id="rec-preparo" rows="4" placeholder="Ex: Amasse a banana.&#10;Misture com o ovo.&#10;Asse na frigideira."></textarea>
+        </div>
+        <div style="display: flex; gap: 0.5em;">
+          <button class="btn small" id="btn-salvar-receita">Salvar Receita</button>
+          <button class="btn ghost small" id="btn-cancelar-receita">Cancelar</button>
+        </div>
+      </div>
+
+      <div class="recipe-grid" id="receitas-grid"></div>
+      <div class="empty-state" id="receitas-empty" style="display: none;">Nenhuma receita encontrada nesta categoria.</div>
+    </div>
+
+    <div class="card" style="margin-top: 1.4em;">
+      <h3 style="margin-bottom: 0.5em;">Comentários e Sugestões</h3>
+      <p style="font-size: 0.9rem; color: var(--ink-soft);">Compartilhe suas dicas sobre alimentação com a rede de apoio.</p>
+      
+      <div class="comment-form" id="form-comentario-alimentacao" style="display: none;">
+        <textarea id="texto-comentario-alimentacao" rows="3" placeholder="Escreva sua dica ou sugestão..."></textarea>
+        <button class="btn small" id="btn-enviar-comentario-alimentacao" style="align-self: flex-end;">Enviar</button>
+      </div>
+      <div id="msg-login-comentario" class="home-note" style="margin-top: 0;">Faça login no topo da página para deixar um comentário.</div>
+
+      <div class="comment-list" id="lista-comentarios-alimentacao"></div>
+    </div>
+  </section>
+
+  <!-- ============ ATIVIDADES ============ -->
+  <section class="view" id="view-atividades">
+    <div class="view-head">
+      <span class="eyebrow">Atividades</span>
+      <h2>Brincadeiras e Interação</h2>
+      <p>Sugestões de atividades para estimular a comunicação, regulação e o vínculo.</p>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1em; margin-bottom: 1em;">
+        <h3 style="margin: 0;">Mural de Atividades</h3>
+        <button class="btn small" id="btn-nova-atividade" style="display: none;">+ Nova Atividade</button>
+      </div>
+
+      <div class="caa-tabs" id="atividades-filtros"></div>
+
+      <div id="form-nova-atividade" style="display: none; background: var(--surface-2); padding: 1em; border-radius: var(--radius-md); margin-bottom: 1em;">
+        <h4 style="margin-top: 0;">Adicionar Atividade</h4>
+        <div class="field-row">
+          <div class="field" style="flex: 2;">
+            <label for="ativ-titulo">Título</label>
+            <input type="text" id="ativ-titulo" placeholder="Ex: Circuito de almofadas">
+          </div>
+          <div class="field" style="flex: 1;">
+            <label for="ativ-icone">Ícone</label>
+            <select id="ativ-icone"></select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="ativ-categoria">Categoria</label>
+          <select id="ativ-categoria"></select>
+        </div>
+        <div class="field">
+          <label for="ativ-descricao">Descrição curta</label>
+          <textarea id="ativ-descricao" rows="3" placeholder="Como funciona a brincadeira?"></textarea>
+        </div>
+        <div style="display: flex; gap: 0.5em;">
+          <button class="btn small" id="btn-salvar-atividade">Salvar Atividade</button>
+          <button class="btn ghost small" id="btn-cancelar-atividade">Cancelar</button>
+        </div>
+      </div>
+
+      <div class="activity-grid" id="atividades-grid"></div>
+      <div class="empty-state" id="atividades-empty" style="display: none;">Nenhuma atividade encontrada nesta categoria.</div>
+    </div>
+  </section>
   <!-- ============ PERFIL ============ -->
   <section class="view" id="view-perfil">
     <div class="view-head">
@@ -548,6 +777,18 @@
       <button class="btn danger" id="p-clear">Limpar tudo</button>
     </div>
     <div id="p-saved-msg" style="display:none;margin-top:1em;" class="home-note">Perfil salvo nesta sessão ✅</div>
+    <div class="card" style="margin-top:1.4em;">
+      <h3 style="margin-bottom: 0.5em;">Depoimentos e Dicas da Rede de Apoio</h3>
+      <p style="font-size: 0.9rem; color: var(--ink-soft);">Compartilhe experiências que deram certo na sua rotina.</p>
+      
+      <div class="comment-form" id="form-depoimento" style="display: none;">
+        <textarea id="texto-depoimento" rows="3" placeholder="Escreva seu depoimento ou dica..."></textarea>
+        <button class="btn small" id="btn-enviar-depoimento" style="align-self: flex-end;">Enviar</button>
+      </div>
+      <div id="msg-login-depoimento" class="home-note" style="margin-top: 0;">Faça login no topo da página para deixar um depoimento.</div>
+
+      <div class="comment-list" id="lista-depoimentos"></div>
+    </div>
   </section>
 
   <!-- ============ BLOG ============ -->
@@ -586,8 +827,49 @@
     </div>
   </div>
 </div>
-
+<div class="login-modal" id="login-modal">
+  <div class="login-content card">
+    <h3>Entrar no Elo TEA</h3>
+    <p class="text-light" style="font-size: 0.9rem; margin-bottom: 16px;">
+      Crie um apelido para salvar suas receitas, atividades e comentários neste aparelho. (Não requer senha)
+    </p>
+    <div class="form-group">
+      <label for="login-username">Seu nome ou apelido</label>
+      <input type="text" id="login-username" placeholder="Ex: Maria">
+    </div>
+    <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+      <button class="btn btn-outline" id="btn-login-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="btn-login-confirm">Entrar</button>
+    </div>
+  </div>
+</div>
 <script>
+/* ======================= STORAGE HELPER ======================= */
+const StorageHelper = {
+  get: function(key, defaultValue) {
+    try {
+      const item = localStorage.getItem('eloTea:' + key);
+      return item ? JSON.parse(item) : defaultValue;
+    } catch (e) {
+      console.error("Erro ao ler do localStorage", e);
+      return defaultValue;
+    }
+  },
+  set: function(key, value) {
+    try {
+      localStorage.setItem('eloTea:' + key, JSON.stringify(value));
+    } catch (e) {
+      console.error("Erro ao salvar no localStorage", e);
+    }
+  },
+  remove: function(key) {
+    try {
+      localStorage.removeItem('eloTea:' + key);
+    } catch (e) {
+      console.error("Erro ao remover do localStorage", e);
+    }
+  }
+};
 /* ======================= DATA ======================= */
 
 const DOORS = [
@@ -758,7 +1040,76 @@ const BLOG = [
     full:`Interesses restritos e intensos costumam ser vistos como algo a ser reduzido, mas eles também são uma via de regulação e de motivação genuína. Em vez de afastar a pessoa do interesse, usá-lo como ponte — para ensinar turnos de conversa, vocabulário novo ou coordenação motora — costuma gerar muito mais engajamento do que atividades "neutras" impostas de fora.`
   }
 ];
+/* ======================= NOVOS DADOS (SEED DATA) ======================= */
+const SELETIVIDADE_INTRO = {
+  texto: `A seletividade alimentar é comum em crianças com sensibilidades sensoriais: texturas, cheiros e sabores intensos podem causar rejeição real, não "frescura". Este espaço reúne receitas nutritivas, sem açúcar refinado e sem estimulantes (cafeína, corantes artificiais), pensadas para respeitar o paladar sensível sem abrir mão do sabor. O acompanhamento de pediatra, nutricionista infantil e terapeuta ocupacional continua sendo essencial — este conteúdo é educativo, não substitui avaliação individual. Ajuste os ingredientes conforme alergias e restrições de cada criança.`,
+  boasPraticas: [
+    'Introdução gradual e sem pressão — pequenos passos contam.',
+    'Horários regulares e apresentação consistente dos alimentos.',
+    'Reforço positivo a cada tentativa; nunca punir ou forçar.',
+    'Apresentação criativa (cores, formatos, nomes divertidos).',
+    'Envolver a criança no preparo, quando possível.',
+    'Sem telas durante as refeições.',
+    'Partir dos alimentos já aceitos para introduzir novidades aos poucos.'
+  ],
+  porQueEvitarAcucar: `Açúcar refinado causa picos e quedas de glicose que podem aumentar irritabilidade e dificuldade de concentração. Cafeína e corantes artificiais podem intensificar ansiedade e agitação. Há também estudos que associam consumo elevado de açúcar a maior inflamação e a desequilíbrios na microbiota intestinal — relevante pelo chamado eixo intestino-cérebro.`,
+  sobreLeiteGluten: `Algumas crianças no espectro apresentam maior incidência de sensibilidade à lactose, à caseína ou ao glúten, o que pode se relacionar a desconforto gastrointestinal e, em alguns casos, a mudanças de comportamento. Restringir grupos alimentares inteiros sem orientação profissional pode causar deficiências nutricionais — qualquer corte deve ser feito com acompanhamento médico/nutricional.`,
+  estrategias: [
+    'Purês escondidos em bases neutras (batata, inhame, aipim).',
+    'Legumes ralados finos em massas de panqueca ou bolinho.',
+    'Molhos batidos com legumes.',
+    'Formatos divertidos com cortadores de biscoito.'
+  ]
+};
 
+const RECEITAS_CATEGORIAS = [
+  'Café da manhã', 'Almoço e jantar', 'Lanches', 'Frutas',
+  'Bolinhos e muffins', 'Chocolates sem cacau', 'Biscoitos e snacks', 'Gelados'
+];
+
+const RECEITAS_SEED = [
+  { id: 'r001', categoria: 'Café da manhã', titulo: 'Panqueca de banana com cenoura', ingredientes: ['1 banana madura amassada', '1/2 cenoura pequena ralada bem fininha', '1/2 xícara de farinha de arroz', '1/4 xícara de água ou leite vegetal sem açúcar', 'Uma pitada de canela em pó (opcional)', 'Um fio de óleo vegetal para untar'], modoPreparo: ['Misture a banana amassada, a cenoura ralada e a farinha de arroz.', 'Adicione o líquido e a canela até obter uma massa homogênea.', 'Aqueça uma frigideira untada em fogo baixo.', 'Despeje pequenas porções e cozinhe cerca de 2 minutos de cada lado.', 'Sirva com frutas picadas.'], autor: 'Elo TEA' },
+  { id: 'r002', categoria: 'Café da manhã', titulo: 'Mingau de aveia com abóbora', ingredientes: ['1/2 xícara de aveia sem glúten', '1 xícara de água ou leite vegetal sem açúcar', '2 colheres de sopa de purê de abóbora cozida', 'Uma pitada de noz-moscada (opcional)'], modoPreparo: ['Misture a aveia e o líquido em uma panela.', 'Leve ao fogo baixo, mexendo sempre, até engrossar.', 'Adicione o purê de abóbora e a noz-moscada.', 'Sirva morno com frutas picadas.'], autor: 'Elo TEA' },
+  { id: 'r003', categoria: 'Café da manhã', titulo: 'Bolinho de batata-doce com coco', ingredientes: ['1 batata-doce pequena cozida e amassada', '2 colheres de sopa de coco ralado sem açúcar', '1 colher de sopa de farinha de coco (ou outra sem glúten)', 'Uma pitada de canela'], modoPreparo: ['Misture todos os ingredientes até formar uma massa moldável.', 'Faça pequenos bolinhos com as mãos.', 'Sirva em temperatura ambiente.'], autor: 'Elo TEA' },
+  { id: 'r004', categoria: 'Almoço e jantar', titulo: 'Nuggets de frango com couve-flor', ingredientes: ['1 peito de frango pequeno cozido e desfiado', '1/2 xícara de couve-flor cozida e amassada', '2 colheres de sopa de farinha de arroz', 'Temperos seguros a gosto (alho, cebola, páprica doce)', 'Um fio de azeite'], modoPreparo: ['Misture o frango, a couve-flor, a farinha e os temperos.', 'Modele os nuggets em formatos divertidos.', 'Asse a 180°C por 15–20 minutos, até dourar levemente.'], autor: 'Elo TEA' },
+  { id: 'r005', categoria: 'Almoço e jantar', titulo: 'Macarrão com molho de cenoura', ingredientes: ['Massa sem glúten cozida', '1 cenoura grande cozida e picada', '1/4 xícara de caldo de legumes caseiro sem sal', 'Um fio de azeite', 'Temperos seguros a gosto'], modoPreparo: ['Bata a cenoura com o caldo e o azeite até obter um molho liso.', 'Aqueça o molho e tempere a gosto.', 'Misture com a massa cozida.'], autor: 'Elo TEA' },
+  { id: 'r006', categoria: 'Almoço e jantar', titulo: 'Escondidinho de carne com purê', ingredientes: ['Carne moída magra cozida com temperos seguros', '2 batatas médias cozidas e amassadas', '1 abobrinha pequena cozida e amassada', 'Um fio de azeite'], modoPreparo: ['Em um refratário, coloque uma camada de carne moída.', 'Misture o purê de batata com a abobrinha amassada.', 'Cubra a carne com o purê.', 'Leve ao forno a 180°C por 15 minutos.'], autor: 'Elo TEA' },
+  { id: 'r007', categoria: 'Almoço e jantar', titulo: 'Creme de batata com espinafre', ingredientes: ['2 batatas médias picadas', '1 xícara de espinafre cozido e picado', '2 xícaras de caldo de legumes caseiro sem sal', 'Um fio de azeite', 'Temperos seguros a gosto'], modoPreparo: ['Refogue os temperos no azeite.', 'Adicione as batatas e o caldo; cozinhe até as batatas ficarem macias.', 'Junte o espinafre e cozinhe mais alguns minutos.', 'Bata no liquidificador até obter um creme liso.'], autor: 'Elo TEA' },
+  { id: 'r008', categoria: 'Lanches', titulo: 'Bolinho de arroz com legumes', ingredientes: ['Arroz cozido', 'Legumes cozidos e picados bem pequenos (cenoura, ervilha, brócolis)', 'Um fio de azeite'], modoPreparo: ['Misture o arroz com os legumes picados.', 'Modele pequenos bolinhos.', 'Sirva em temperatura ambiente.'], autor: 'Elo TEA' },
+  { id: 'r009', categoria: 'Lanches', titulo: 'Palitos de polenta com cenoura', ingredientes: ['Polenta pronta sem glúten e sem açúcar', 'Cenoura ralada bem fininha', 'Um fio de azeite'], modoPreparo: ['Misture a polenta com a cenoura ralada.', 'Corte em formato de palitos.', 'Asse a 180°C até ficarem levemente crocantes.'], autor: 'Elo TEA' },
+  { id: 'r010', categoria: 'Lanches', titulo: 'Smoothie de frutas com legume', ingredientes: ['Frutas preferidas da criança (banana, manga, morango)', 'Uma pequena porção de legume neutro (pepino sem casca ou abacate)', 'Água ou leite vegetal sem açúcar'], modoPreparo: ['Bata todos os ingredientes no liquidificador até ficar homogêneo.'], autor: 'Elo TEA' },
+  { id: 'r011', categoria: 'Frutas', titulo: 'Espetinho colorido com iogurte', ingredientes: ['Morangos, melão, kiwi, uvas', 'Iogurte natural sem açúcar'], modoPreparo: ['Monte os espetinhos intercalando as frutas.', 'Sirva com potinhos de iogurte para mergulhar.'], autor: 'Elo TEA' },
+  { id: 'r012', categoria: 'Frutas', titulo: '"Pizza" de frutas', ingredientes: ['Fatia de melancia ou banana', 'Frutas picadas (manga, kiwi, morango)'], modoPreparo: ['Use a fatia como base e cubra com as frutas picadas.', 'Corte em triângulos.'], autor: 'Elo TEA' },
+  { id: 'r013', categoria: 'Frutas', titulo: 'Geleia natural de morango', ingredientes: ['2 xícaras de morango', '2 colheres de sopa de água', 'Suco de limão a gosto'], modoPreparo: ['Cozinhe os morangos com a água.', 'Bata até virar uma calda grossa.', 'Adicione o limão e sirva fria.'], autor: 'Elo TEA' },
+  { id: 'r014', categoria: 'Frutas', titulo: 'Purê de maçã com canela', ingredientes: ['2 maçãs descascadas', 'Canela a gosto'], modoPreparo: ['Asse ou cozinhe as maçãs até ficarem macias.', 'Amasse e adicione a canela.'], autor: 'Elo TEA' },
+  { id: 'r015', categoria: 'Bolinhos e muffins', titulo: 'Bolinho de banana, aveia e passas', ingredientes: ['2 bananas maduras', '1 xícara de aveia', '1/2 xícara de passas'], modoPreparo: ['Amasse a banana e misture com a aveia e as passas.', 'Asse a 180°C por 20 minutos.'], autor: 'Elo TEA' },
+  { id: 'r016', categoria: 'Bolinhos e muffins', titulo: 'Muffin de maçã e canela', ingredientes: ['1 maçã ralada', '1 xícara de farinha de aveia', '1 ovo', '1/2 colher de chá de fermento'], modoPreparo: ['Misture todos os ingredientes.', 'Coloque em forminhas e asse a 180°C por 25 minutos.'], autor: 'Elo TEA' },
+  { id: 'r017', categoria: 'Bolinhos e muffins', titulo: 'Bolinho de cenoura com tâmaras', ingredientes: ['1 cenoura cozida', '1/2 xícara de tâmaras', '1 xícara de farinha de amêndoas'], modoPreparo: ['Bata tudo no processador.', 'Asse a 180°C por 25 minutos.'], autor: 'Elo TEA' },
+  { id: 'r018', categoria: 'Chocolates sem cacau', titulo: 'Mousse de abacate com banana', ingredientes: ['1 abacate', '1 banana madura', 'Baunilha a gosto'], modoPreparo: ['Bata todos os ingredientes até virar um creme.', 'Sirva gelado.'], autor: 'Elo TEA' },
+  { id: 'r019', categoria: 'Chocolates sem cacau', titulo: 'Creme de inhame com alfarroba', ingredientes: ['1 xícara de inhame cozido', '1 colher de sopa de alfarroba', '1 banana madura'], modoPreparo: ['Bata tudo no processador.', 'Leve à geladeira antes de servir.'], autor: 'Elo TEA' },
+  { id: 'r020', categoria: 'Biscoitos e snacks', titulo: 'Biscoito de aveia e banana', ingredientes: ['2 bananas maduras', '1 xícara de aveia'], modoPreparo: ['Amasse a banana e misture com a aveia.', 'Molde os biscoitos e asse a 180°C por 20 minutos.'], autor: 'Elo TEA' },
+  { id: 'r021', categoria: 'Biscoitos e snacks', titulo: 'Chips de batata-doce', ingredientes: ['Batata-doce fatiada bem fina', 'Azeite', 'Uma pitada de sal'], modoPreparo: ['Regue as fatias com azeite e sal.', 'Asse a 180°C até dourar.'], autor: 'Elo TEA' },
+  { id: 'r022', categoria: 'Gelados', titulo: 'Sorvete de banana congelada', ingredientes: ['2 bananas congeladas em pedaços', 'Frutas congeladas a gosto (morango, manga)'], modoPreparo: ['Bata as bananas congeladas até virar um creme.', 'Adicione outras frutas congeladas, se desejar.'], autor: 'Elo TEA' },
+  { id: 'r023', categoria: 'Gelados', titulo: 'Picolé natural de frutas', ingredientes: ['Frutas batidas (morango, melancia ou manga)'], modoPreparo: ['Bata as frutas até obter uma consistência homogênea.', 'Coloque em forminhas de picolé e congele.'], autor: 'Elo TEA' }
+];
+
+const ATIVIDADES_CATEGORIAS = [
+  'Imitação', 'Faz de conta', 'Suportes visuais', 'Jogos com regras', 'Sensorial', 'Culinária', 'Calma e regulação'
+];
+
+const ATIVIDADES_SEED = [
+  { id: 'a001', categoria: 'Imitação', icone: '🙌', titulo: 'Imitar gestos e sons', descricao: 'Imite ações, sons de animais ou expressões faciais. Comece imitando a criança e depois incentive-a a imitar você.', autor: 'Elo TEA' },
+  { id: 'a002', categoria: 'Faz de conta', icone: '🏠', titulo: 'Brincar de casinha ou mercadinho', descricao: 'Use brinquedos que representam objetos do cotidiano e modele frases simples relacionadas à brincadeira.', autor: 'Elo TEA' },
+  { id: 'a003', categoria: 'Suportes visuais', icone: '🧩', titulo: 'Quebra-cabeça de poucos pedaços', descricao: 'Comece com quebra-cabeças simples e imagens claras, aumentando a complexidade aos poucos.', autor: 'Elo TEA' },
+  { id: 'a004', categoria: 'Suportes visuais', icone: '🃏', titulo: 'Jogo da memória com temas de interesse', descricao: 'Use cartas com pares de figuras dos personagens ou animais favoritos da criança.', autor: 'Elo TEA' },
+  { id: 'a005', categoria: 'Jogos com regras', icone: '🫧', titulo: 'Bolinhas de sabão', descricao: 'Jogo simples com regras claras, ótimo para praticar esperar a vez e pedir "mais".', autor: 'Elo TEA' },
+  { id: 'a006', categoria: 'Jogos com regras', icone: '🙈', titulo: 'Esconde-esconde', descricao: 'Ajuda a desenvolver espera, previsibilidade e alegria na interação.', autor: 'Elo TEA' },
+  { id: 'a007', categoria: 'Sensorial', icone: '🏖️', titulo: 'Caixa sensorial de texturas', descricao: 'Explore areia, água, massinha, tecidos e grãos em uma caixa, sempre com supervisão.', autor: 'Elo TEA' },
+  { id: 'a008', categoria: 'Sensorial', icone: '🔦', titulo: 'Brincar com luzes e lanternas', descricao: 'Use lanternas ou brinquedos luminosos; siga os movimentos com os olhos e nomeie as cores.', autor: 'Elo TEA' },
+  { id: 'a009', categoria: 'Culinária', icone: '🥗', titulo: 'Salada de frutas em equipe', descricao: 'Envolva a criança em uma receita simples e segura, nomeando cores, formas e ações.', autor: 'Elo TEA' },
+  { id: 'a010', categoria: 'Calma e regulação', icone: '🧸', titulo: 'Cantinho da calma', descricao: 'Monte um espaço com almofadas e itens sensoriais para momentos de autorregulação.', autor: 'Elo TEA' },
+  { id: 'a011', categoria: 'Calma e regulação', icone: '🗓️', titulo: 'Calendário visual do dia', descricao: 'Crie um quadro visual com as tarefas do dia, reforçando previsibilidade e reduzindo ansiedade.', autor: 'Elo TEA' }
+];
 /* ======================= TAB NAVIGATION ======================= */
 const tabButtons = document.querySelectorAll('nav.tabs button');
 const views = document.querySelectorAll('section.view');
@@ -1011,7 +1362,385 @@ BLOG.forEach(post=>{
   el.addEventListener('click',()=>el.classList.toggle('open'));
   blogGridEl.appendChild(el);
 });
+/* ======================= LOGIN LOCAL ======================= */
+let currentUser = StorageHelper.get('usuarioLogado', null);
 
+function updateLoginUI() {
+  const bar = document.getElementById('login-bar');
+  const btnNovaRec = document.getElementById('btn-nova-receita');
+  const formComAlim = document.getElementById('form-comentario-alimentacao');
+  const msgComAlim = document.getElementById('msg-login-comentario');
+  const btnNovaAtiv = document.getElementById('btn-nova-atividade');
+  const formDepo = document.getElementById('form-depoimento');
+  const msgDepo = document.getElementById('msg-login-depoimento');
+
+  if (currentUser) {
+    bar.innerHTML = `
+      <div class="login-avatar">${currentUser.charAt(0)}</div>
+      <span style="font-weight:bold;">${currentUser}</span>
+      <button class="login-btn" id="btn-logout" style="margin-left:8px; font-size:0.8rem; padding:2px 8px;">Sair</button>
+    `;
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      StorageHelper.remove('usuarioLogado');
+      currentUser = null;
+      updateLoginUI();
+    });
+    
+    if(btnNovaRec) btnNovaRec.style.display = 'inline-flex';
+    if(formComAlim) formComAlim.style.display = 'flex';
+    if(msgComAlim) msgComAlim.style.display = 'none';
+    if(btnNovaAtiv) btnNovaAtiv.style.display = 'inline-flex';
+    if(formDepo) formDepo.style.display = 'flex';
+    if(msgDepo) msgDepo.style.display = 'none';
+  } else {
+    bar.innerHTML = `<button class="login-btn" id="btn-login-open">Entrar</button>`;
+    document.getElementById('btn-login-open').addEventListener('click', () => {
+      document.getElementById('login-modal').classList.add('active');
+    });
+    
+    if(btnNovaRec) btnNovaRec.style.display = 'none';
+    if(formComAlim) formComAlim.style.display = 'none';
+    if(msgComAlim) msgComAlim.style.display = 'block';
+    if(btnNovaAtiv) btnNovaAtiv.style.display = 'none';
+    if(formDepo) formDepo.style.display = 'none';
+    if(msgDepo) msgDepo.style.display = 'block';
+    
+    // Esconde formulários se estivessem abertos
+    if(document.getElementById('form-nova-receita')) document.getElementById('form-nova-receita').style.display = 'none';
+    if(document.getElementById('form-nova-atividade')) document.getElementById('form-nova-atividade').style.display = 'none';
+  }
+}
+
+document.getElementById('btn-login-cancel').addEventListener('click', () => {
+  document.getElementById('login-modal').classList.remove('active');
+});
+
+document.getElementById('btn-login-confirm').addEventListener('click', () => {
+  const name = document.getElementById('login-username').value.trim();
+  if (name) {
+    currentUser = name;
+    StorageHelper.set('usuarioLogado', currentUser);
+    document.getElementById('login-modal').classList.remove('active');
+    updateLoginUI();
+    // Re-renderiza comentários para mostrar o botão de apagar nos comentários do usuário
+    renderComentariosAlimentacao();
+    renderDepoimentos();
+  }
+});
+
+updateLoginUI();
+
+/* ======================= ALIMENTAÇÃO ======================= */
+// 1. Introdução à Seletividade
+document.getElementById('seletividade-texto').textContent = SELETIVIDADE_INTRO.texto;
+const accSel = document.getElementById('acc-seletividade');
+
+function createAccItem(title, content) {
+  return `
+    <div class="acc-item">
+      <button class="acc-head" aria-expanded="false">
+        <span>${title}</span><span class="chev">▾</span>
+      </button>
+      <div class="acc-body"><div class="acc-body-in"><p style="margin-top:0.8em;">${content}</p></div></div>
+    </div>`;
+}
+
+let selHtml = createAccItem('Boas Práticas', '<ul style="padding-left:20px;">' + SELETIVIDADE_INTRO.boasPraticas.map(i=>`<li style="margin-bottom:4px;">${i}</li>`).join('') + '</ul>');
+selHtml += createAccItem('Por que evitar açúcar e estimulantes?', SELETIVIDADE_INTRO.porQueEvitarAcucar);
+selHtml += createAccItem('Sobre leite e glúten', SELETIVIDADE_INTRO.sobreLeiteGluten);
+selHtml += createAccItem('Estratégias Práticas', '<ul style="padding-left:20px;">' + SELETIVIDADE_INTRO.estrategias.map(i=>`<li style="margin-bottom:4px;">${i}</li>`).join('') + '</ul>');
+accSel.innerHTML = selHtml;
+
+accSel.querySelectorAll('.acc-head').forEach(head => {
+  head.addEventListener('click', function() {
+    const item = this.parentElement;
+    const open = item.classList.contains('open');
+    item.classList.toggle('open', !open);
+    this.setAttribute('aria-expanded', String(!open));
+  });
+});
+
+// 2. Receitas
+let userReceitas = StorageHelper.get('receitas', []);
+let allReceitas = [...RECEITAS_SEED, ...userReceitas];
+let currentRecCat = RECEITAS_CATEGORIAS[0];
+
+const recFiltros = document.getElementById('receitas-filtros');
+const recGrid = document.getElementById('receitas-grid');
+const recCatSelect = document.getElementById('rec-categoria');
+
+RECEITAS_CATEGORIAS.forEach(cat => {
+  const b = document.createElement('button');
+  b.textContent = cat;
+  if(cat === currentRecCat) b.classList.add('active');
+  b.addEventListener('click', () => {
+    currentRecCat = cat;
+    Array.from(recFiltros.children).forEach(c => c.classList.remove('active'));
+    b.classList.add('active');
+    renderReceitas();
+  });
+  recFiltros.appendChild(b);
+  
+  const opt = document.createElement('option');
+  opt.value = cat; opt.textContent = cat;
+  recCatSelect.appendChild(opt);
+});
+
+function renderReceitas() {
+  recGrid.innerHTML = '';
+  const filtered = allReceitas.filter(r => r.categoria === currentRecCat);
+  
+  if (filtered.length === 0) {
+    document.getElementById('receitas-empty').style.display = 'block';
+  } else {
+    document.getElementById('receitas-empty').style.display = 'none';
+    filtered.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'card recipe-card';
+      card.innerHTML = `
+        <h4 style="margin:0;">${r.titulo}</h4>
+        <div class="recipe-meta"><span>Por: ${r.autor}</span></div>
+        <div style="font-size:0.9rem; margin-top:8px;">
+          <strong>Ingredientes:</strong>
+          <ul style="padding-left:20px; margin-top:4px; margin-bottom:8px;">
+            ${r.ingredientes.map(i => `<li>${i}</li>`).join('')}
+          </ul>
+          <strong>Preparo:</strong>
+          <ol style="padding-left:20px; margin-top:4px; margin-bottom:8px;">
+            ${r.modoPreparo.map(p => `<li>${p}</li>`).join('')}
+          </ol>
+        </div>
+        <button class="btn ghost small btn-share" style="align-self:flex-start; margin-top:auto;">🔗 Compartilhar</button>
+      `;
+      
+      card.querySelector('.btn-share').addEventListener('click', (e) => {
+        const text = `Receita: ${r.titulo}\n\nIngredientes:\n- ${r.ingredientes.join('\n- ')}\n\nPreparo:\n1. ${r.modoPreparo.join('\n2. ')}\n\nVia Elo TEA`;
+        if(navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(() => {
+            const btn = e.target;
+            const oldText = btn.textContent;
+            btn.textContent = '✅ Copiado!';
+            setTimeout(() => btn.textContent = oldText, 2000);
+          }).catch(()=>{});
+        }
+      });
+      
+      recGrid.appendChild(card);
+    });
+  }
+}
+renderReceitas();
+
+document.getElementById('btn-nova-receita').addEventListener('click', () => {
+  document.getElementById('form-nova-receita').style.display = 'block';
+});
+document.getElementById('btn-cancelar-receita').addEventListener('click', () => {
+  document.getElementById('form-nova-receita').style.display = 'none';
+});
+document.getElementById('btn-salvar-receita').addEventListener('click', () => {
+  const titulo = document.getElementById('rec-titulo').value.trim();
+  const categoria = document.getElementById('rec-categoria').value;
+  const ingr = document.getElementById('rec-ingredientes').value.split('\n').map(i=>i.trim()).filter(i=>i);
+  const prep = document.getElementById('rec-preparo').value.split('\n').map(p=>p.trim()).filter(p=>p);
+  
+  if(!titulo || ingr.length===0 || prep.length===0) {
+    alert('Preencha o título, ingredientes e modo de preparo.');
+    return;
+  }
+  
+  const novaRec = {
+    id: 'usr_' + Date.now(),
+    categoria, titulo, ingredientes: ingr, modoPreparo: prep, autor: currentUser
+  };
+  
+  userReceitas.push(novaRec);
+  StorageHelper.set('receitas', userReceitas);
+  allReceitas = [...RECEITAS_SEED, ...userReceitas];
+  
+  document.getElementById('rec-titulo').value = '';
+  document.getElementById('rec-ingredientes').value = '';
+  document.getElementById('rec-preparo').value = '';
+  document.getElementById('form-nova-receita').style.display = 'none';
+  
+  currentRecCat = categoria;
+  Array.from(recFiltros.children).forEach(c => {
+    c.classList.toggle('active', c.textContent === categoria);
+  });
+  renderReceitas();
+});
+
+/* ======================= COMENTÁRIOS E DEPOIMENTOS ======================= */
+function renderGenericComments(containerId, storageKey) {
+  const container = document.getElementById(containerId);
+  const comments = StorageHelper.get(storageKey, []);
+  container.innerHTML = '';
+  
+  if(comments.length === 0) {
+    container.innerHTML = '<div class="empty-state">Nenhum comentário ainda. Seja o primeiro!</div>';
+    return;
+  }
+  
+  // Ordena do mais recente para o mais antigo
+  comments.sort((a,b) => b.date - a.date).forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'comment-item';
+    const dateStr = new Date(c.date).toLocaleDateString('pt-BR');
+    
+    let delBtn = '';
+    if (currentUser && c.author === currentUser) {
+      delBtn = `<button class="icon-btn" style="width:24px;height:24px;font-size:0.7rem;border:none;background:transparent;" title="Apagar">🗑️</button>`;
+    }
+    
+    div.innerHTML = `
+      <div class="comment-header">
+        <strong>${c.author}</strong>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span>${dateStr}</span>
+          ${delBtn}
+        </div>
+      </div>
+      <div style="font-size:0.95rem;">${c.text}</div>
+    `;
+    
+    if (delBtn) {
+      div.querySelector('button').addEventListener('click', () => {
+        if(confirm('Apagar este comentário?')) {
+          const updated = comments.filter(x => x.id !== c.id);
+          StorageHelper.set(storageKey, updated);
+          renderGenericComments(containerId, storageKey);
+        }
+      });
+    }
+    
+    container.appendChild(div);
+  });
+}
+
+function setupCommentForm(btnId, inputId, containerId, storageKey) {
+  document.getElementById(btnId).addEventListener('click', () => {
+    const input = document.getElementById(inputId);
+    const text = input.value.trim();
+    if(!text || !currentUser) return;
+    
+    const comments = StorageHelper.get(storageKey, []);
+    comments.push({
+      id: Date.now(),
+      author: currentUser,
+      text: text,
+      date: Date.now()
+    });
+    StorageHelper.set(storageKey, comments);
+    
+    input.value = '';
+    renderGenericComments(containerId, storageKey);
+  });
+}
+
+function renderComentariosAlimentacao() { renderGenericComments('lista-comentarios-alimentacao', 'comentariosAlimentacao'); }
+function renderDepoimentos() { renderGenericComments('lista-depoimentos', 'depoimentos'); }
+
+setupCommentForm('btn-enviar-comentario-alimentacao', 'texto-comentario-alimentacao', 'lista-comentarios-alimentacao', 'comentariosAlimentacao');
+setupCommentForm('btn-enviar-depoimento', 'texto-depoimento', 'lista-depoimentos', 'depoimentos');
+
+renderComentariosAlimentacao();
+renderDepoimentos();
+
+/* ======================= ATIVIDADES ======================= */
+let userAtividades = StorageHelper.get('atividades', []);
+let allAtividades = [...ATIVIDADES_SEED, ...userAtividades];
+let currentAtivCat = ATIVIDADES_CATEGORIAS[0];
+
+const ativFiltros = document.getElementById('atividades-filtros');
+const ativGrid = document.getElementById('atividades-grid');
+const ativCatSelect = document.getElementById('ativ-categoria');
+const ativIconSelect = document.getElementById('ativ-icone');
+
+ATIVIDADES_CATEGORIAS.forEach(cat => {
+  const b = document.createElement('button');
+  b.textContent = cat;
+  if(cat === currentAtivCat) b.classList.add('active');
+  b.addEventListener('click', () => {
+    currentAtivCat = cat;
+    Array.from(ativFiltros.children).forEach(c => c.classList.remove('active'));
+    b.classList.add('active');
+    renderAtividades();
+  });
+  ativFiltros.appendChild(b);
+  
+  const opt = document.createElement('option');
+  opt.value = cat; opt.textContent = cat;
+  ativCatSelect.appendChild(opt);
+});
+
+ICON_OPTIONS.forEach(ic => {
+  const opt = document.createElement('option');
+  opt.value = ic; opt.textContent = ic;
+  ativIconSelect.appendChild(opt);
+});
+
+function renderAtividades() {
+  ativGrid.innerHTML = '';
+  const filtered = allAtividades.filter(a => a.categoria === currentAtivCat);
+  
+  if (filtered.length === 0) {
+    document.getElementById('atividades-empty').style.display = 'block';
+  } else {
+    document.getElementById('atividades-empty').style.display = 'none';
+    filtered.forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'card activity-card';
+      card.innerHTML = `
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="font-size:2rem; background:var(--surface-2); width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:12px; flex-shrink:0;">${a.icone}</div>
+          <div>
+            <h4 style="margin:0 0 4px 0;">${a.titulo}</h4>
+            <p style="font-size:0.9rem; margin:0; color:var(--ink-soft);">${a.descricao}</p>
+          </div>
+        </div>
+        <div class="recipe-meta" style="margin-top:auto; padding-top:12px;"><span>Por: ${a.autor}</span></div>
+      `;
+      ativGrid.appendChild(card);
+    });
+  }
+}
+renderAtividades();
+
+document.getElementById('btn-nova-atividade').addEventListener('click', () => {
+  document.getElementById('form-nova-atividade').style.display = 'block';
+});
+document.getElementById('btn-cancelar-atividade').addEventListener('click', () => {
+  document.getElementById('form-nova-atividade').style.display = 'none';
+});
+document.getElementById('btn-salvar-atividade').addEventListener('click', () => {
+  const titulo = document.getElementById('ativ-titulo').value.trim();
+  const categoria = document.getElementById('ativ-categoria').value;
+  const icone = document.getElementById('ativ-icone').value;
+  const descricao = document.getElementById('ativ-descricao').value.trim();
+  
+  if(!titulo || !descricao) {
+    alert('Preencha o título e a descrição.');
+    return;
+  }
+  
+  const novaAtiv = {
+    id: 'usr_' + Date.now(),
+    categoria, titulo, icone, descricao, autor: currentUser
+  };
+  
+  userAtividades.push(novaAtiv);
+  StorageHelper.set('atividades', userAtividades);
+  allAtividades = [...ATIVIDADES_SEED, ...userAtividades];
+  
+  document.getElementById('ativ-titulo').value = '';
+  document.getElementById('ativ-descricao').value = '';
+  document.getElementById('form-nova-atividade').style.display = 'none';
+  
+  currentAtivCat = categoria;
+  Array.from(ativFiltros.children).forEach(c => {
+    c.classList.toggle('active', c.textContent === categoria);
+  });
+  renderAtividades();
+});
 /* ======================= MASCOT PIP ======================= */
 const PIP_TIPS = {
   home:'Oi! Aqui você encontra o mapa geral do app. Se for sua primeira vez, abra o Guia Rápido ali em cima.',
