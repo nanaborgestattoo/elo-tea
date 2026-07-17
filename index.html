@@ -473,6 +473,136 @@
   border-radius: 12px;
   margin-top: 16px;
 }
+/* ===== COMPONENTES DO ARTIGO / GUIA ===== */
+.article-header {
+  text-align: center;
+  margin-bottom: 2em;
+}
+.article-header h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: var(--primary-dark);
+  margin-bottom: 0.2em;
+}
+.article-header p {
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+}
+.toc-menu {
+  position: sticky;
+  top: 65px; /* Fica logo abaixo do header principal */
+  z-index: 40;
+  background: rgba(250,247,242,0.95);
+  backdrop-filter: blur(6px);
+  padding: 12px 0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 2em;
+  white-space: nowrap;
+}
+.toc-menu a {
+  background: var(--surface);
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid var(--line);
+  transition: all 0.2s;
+}
+.toc-menu a:hover {
+  background: var(--primary-tint);
+  color: var(--primary-dark);
+  border-color: var(--primary-tint);
+}
+.alert-warn {
+  background: var(--warn-tint);
+  border-left: 4px solid var(--warn);
+  padding: 1.2em;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font-size: 0.95rem;
+  margin-bottom: 2em;
+  line-height: 1.6;
+}
+.article-block {
+  margin-bottom: 2.5em;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+.article-block h2, .article-block h3 {
+  color: var(--primary-dark);
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+}
+.article-block ul {
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+.article-block li {
+  margin-bottom: 0.5em;
+}
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 1em;
+  margin-bottom: 2em;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+}
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  font-size: 0.95rem;
+}
+.styled-table th, .styled-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.styled-table th {
+  background: var(--surface-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+}
+.styled-table tr:last-child td {
+  border-bottom: none;
+}
+.styled-table tr:nth-child(even) {
+  background: var(--surface);
+}
+.strategy-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.strategy-icon {
+  font-size: 1.8rem;
+  background: var(--secondary-tint);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.ref-category {
+  margin-top: 1.5em;
+}
+.ref-category h4 {
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.5em;
+}
+.ref-category ul {
+  list-style-type: square;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
 </style>
 </head>
 <body>
@@ -492,6 +622,8 @@
   <button class="tab" data-tab="atividades">Atividades</button>
   <button class="tab" data-tab="treinos">Treinos</button>
   <button class="tab" data-tab="perfil">Perfil</button>
+  <button class="tab" data-tab="indicacoes">Indicações</button>
+  <button class="tab" data-tab="guia">Guia Completo</button>
 </nav>
   </div>
 </header>
@@ -790,6 +922,64 @@
       <div class="comment-list" id="lista-depoimentos"></div>
     </div>
   </section>
+  <!-- ============ INDICAÇÕES (REDE DE APOIO) ============ -->
+  <section class="view" id="view-indicacoes">
+    <div class="view-head">
+      <span class="eyebrow">Rede de Apoio</span>
+      <h2>Profissionais e Serviços</h2>
+      <p>Indicações da comunidade de profissionais, clínicas e serviços acolhedores e atualizados.</p>
+    </div>
+
+    <div class="home-note" style="margin-top: 0; margin-bottom: 1.5em;">
+      ⚠️ <strong>Atenção:</strong> As indicações abaixo são feitas por outros usuários baseadas em experiências pessoais. O Elo TEA não tem vínculo com os profissionais. Sempre verifique o registro profissional (CRM, CRP, CREFITO, etc.) e a abordagem utilizada.
+    </div>
+
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1em; margin-bottom: 1em;">
+        <h3 style="margin: 0;">Mural de Indicações</h3>
+        <button class="btn small" id="btn-nova-indicacao" style="display: none;">+ Indicar Profissional</button>
+      </div>
+
+      <div class="caa-tabs" id="ind-filtros"></div>
+
+      <!-- Formulário para adicionar indicação -->
+      <div id="form-nova-indicacao" style="display: none; background: var(--surface-2); padding: 1em; border-radius: var(--radius-md); margin-bottom: 1em;">
+        <h4 style="margin-top: 0;">Compartilhar Indicação</h4>
+        <div class="field-row">
+          <div class="field" style="flex: 2;">
+            <label for="ind-nome">Nome do Profissional ou Clínica</label>
+            <input type="text" id="ind-nome" placeholder="Ex: Dra. Ana Silva">
+          </div>
+          <div class="field" style="flex: 1;">
+            <label for="ind-especialidade">Especialidade</label>
+            <select id="ind-especialidade"></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field" style="flex: 1;">
+            <label for="ind-local">Cidade / Estado (ou Online)</label>
+            <input type="text" id="ind-local" placeholder="Ex: São Paulo - SP ou Online">
+          </div>
+          <div class="field" style="flex: 1;">
+            <label for="ind-contato">Contato (Instagram, Site ou Telefone)</label>
+            <input type="text" id="ind-contato" placeholder="Ex: @dra.anasilva">
+          </div>
+        </div>
+        <div class="field">
+          <label for="ind-motivo">Por que você indica?</label>
+          <textarea id="ind-motivo" rows="2" placeholder="Ex: Muito acolhedora, usa práticas baseadas em evidências..."></textarea>
+        </div>
+        <div style="display: flex; gap: 0.5em;">
+          <button class="btn small" id="btn-salvar-indicacao">Salvar Indicação</button>
+          <button class="btn ghost small" id="btn-cancelar-indicacao">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Grid onde os cards vão aparecer -->
+      <div class="grid-2" id="ind-grid" style="margin-top: 1em;"></div>
+      <div class="empty-state" id="ind-empty" style="display: none;">Nenhuma indicação encontrada nesta categoria.</div>
+    </div>
+  </section>
 
   <!-- ============ BLOG ============ -->
   <section class="view" id="view-blog">
@@ -800,7 +990,275 @@
     </div>
     <div class="blog-grid" id="blog-grid"></div>
   </section>
+<!-- ============ GUIA / ARTIGO ============ -->
+  <section class="view" id="view-guia">
+    
+    <div class="article-header">
+      <h1>Guia de Apoio e Mapeamento no Espectro Autista</h1>
+      <p>Uma abordagem científica, humana e despatologizante</p>
+    </div>
 
+    <!-- [NAVEGAÇÃO / TOC] -->
+    <div class="toc-menu">
+      <a href="#introducao">Introdução</a>
+      <a href="#fundamentos">Fundamentos</a>
+      <a href="#mapeamento">Mapeamento</a>
+      <a href="#protocolo-escuta">Protocolo de Escuta</a>
+      <a href="#estrategias">Estratégias</a>
+      <a href="#referencias">Referências</a>
+    </div>
+
+    <!-- [AVISO] -->
+    <div class="alert-warn">
+      <strong>Aviso importante sobre o uso deste material:</strong> Este guia tem finalidade educativa e busca apoiar pais, cuidadores, educadores e redes de apoio na compreensão do autismo e na construção de estratégias de suporte no dia a dia. Ele não substitui uma avaliação diagnóstica ou terapêutica. Sempre que possível, o mapeamento aqui proposto deve caminhar lado a lado com o acompanhamento de uma equipe multiprofissional qualificada (psicologia, fonoaudiologia, terapia ocupacional, neurologia/psiquiatria e pedagogia), que utiliza instrumentos padronizados e validados cientificamente.
+    </div>
+
+    <!-- [TEXTO_PADRAO] Introdução -->
+    <div id="introducao" class="article-block">
+      <h2>1. Introdução e Propósito</h2>
+      <p>Este material foi desenhado para oferecer uma base informativa rigorosa e, ao mesmo tempo, gentil — substituindo o olhar do 'defeito' pela perspectiva da funcionalidade, do suporte e da dignidade humana. A proposta é ajudar famílias e profissionais a compreender antes de intervir: entender como cada pessoa autista processa o mundo para, a partir disso, construir estratégias de apoio verdadeiramente individualizadas.</p>
+      <p>O guia está dividido em quatro partes:</p>
+      <ul>
+        <li>os fundamentos científicos sobre o papel do ambiente no desenvolvimento;</li>
+        <li>o mapeamento de perfis funcionais (sensorial, cognitivo e comunicativo);</li>
+        <li>um roteiro de escuta para observar e compreender a pessoa autista em seu contexto;</li>
+        <li>estratégias práticas de manejo, organizadas por perfil, e uma base de referências para aprofundamento contínuo.</li>
+      </ul>
+    </div>
+
+    <!-- [TEXTO_PADRAO] Fundamentos -->
+    <div id="fundamentos" class="article-block">
+      <h2>2. Fundamentos: o Papel do Ambiente no Desenvolvimento</h2>
+      <p>O desenvolvimento de uma pessoa autista não depende apenas de características neurológicas intrínsecas — depende, de forma muito concreta, do ambiente em que essa pessoa está inserida. A ciência do desenvolvimento humano mostra que o cérebro é plástico, mas essa plasticidade só se traduz em autonomia e bem-estar quando existe uma estrutura de suporte adequada ao redor.</p>
+      <ul>
+        <li><strong>Acesso e desigualdade:</strong> crianças e adultos com diagnóstico precoce, terapias baseadas em evidências, ambiente escolar adaptado e estabilidade de cuidado tendem a desenvolver habilidades de autorregulação e comunicação de forma mais consistente. Isso não é sorte — é o resultado esperado quando o estresse ambiental é reduzido e o suporte profissional está disponível.</li>
+        <li><strong>Barreiras estruturais:</strong> por outro lado, famílias que enfrentam longas filas de espera no sistema público, desconhecimento por parte de profissionais e falta de recursos básicos lidam com um agravamento real dos desafios. É comum que comportamentos rotulados como 'crise' ou 'agressividade' sejam, na verdade, respostas compreensíveis a um ambiente hostil, à sobrecarga sensorial crônica ou à ausência de ferramentas de comunicação adequadas.</li>
+        <li><strong>O que significa despatologizar:</strong> despatologizar é compreender o autismo como uma variação do desenvolvimento humano — a neurodivergência — e não como uma doença a ser curada. Esse é o núcleo do paradigma da neurodiversidade, cunhado a partir da tese de honras da socióloga australiana Judy Singer (1998) e do conceito de 'diversidade neurológica' do jornalista Harvey Blume, publicado no mesmo período. Pesquisas recentes mostram que essa ideia não nasceu de uma única autora, mas emergiu de forma coletiva dentro das próprias comunidades online de pessoas autistas nos anos 1990 (Botha et al., 2024) — o que reforça que a neurodiversidade sempre foi, antes de tudo, uma construção da própria comunidade autista.</li>
+        <li><strong>A perspectiva relacional da comunicação:</strong> o pesquisador autista Damian Milton propôs o conceito do 'problema da dupla empatia' (Milton, 2012), segundo o qual as dificuldades de comunicação entre pessoas autistas e não autistas não são uma falha unilateral, mas um desencontro mútuo entre duas formas distintas — e igualmente válidas — de processar e compartilhar experiências. Essa é hoje uma das lentes mais influentes na área, embora, como toda proposta teórica, siga sendo debatida e testada empiricamente.</li>
+        <li>Comportamentos como movimentos repetitivos (estimulagem/'stimming') ou hiperfocos são formas legítimas de regulação e processamento do mundo. O foco das intervenções deve ser a eliminação de barreiras e o desenvolvimento de autonomia — não a modelagem do comportamento autista para que a pessoa 'pareça' neurotípica.</li>
+      </ul>
+    </div>
+
+    <!-- [TEXTO_PADRAO] Mapeamento -->
+    <div id="mapeamento" class="article-block">
+      <h2>3. Mapeamento de Perfis Funcionais</h2>
+      <p>Cada pessoa autista é única. Mesmo compartilhando padrões centrais do espectro, a forma como cada uma se afeta e responde ao ambiente varia muito. Um bom ponto de partida é mapear a responsividade da pessoa em três eixos: sensorial, cognitivo/rotina e comunicativo.</p>
+      
+      <!-- [TABELA_DADOS] -->
+      <h3>3.1 Perfil de Processamento Sensorial</h3>
+      <p>Este eixo pode ser compreendido com base no Modelo dos Quatro Quadrantes de Processamento Sensorial, desenvolvido pela terapeuta ocupacional Winnie Dunn (1997) e amplamente utilizado em avaliações de terapia ocupacional. O modelo cruza dois eixos: o limiar neurológico (baixo a alto) e a estratégia de resposta (passiva a ativa), formando quatro perfis possíveis. (Nota: Uma mesma pessoa pode apresentar perfis diferentes para sentidos diferentes).</p>
+      
+      <div class="table-responsive">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Perfil</th>
+              <th>Limiar</th>
+              <th>Resposta</th>
+              <th>Como se manifesta</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Baixo registro</strong></td>
+              <td>Alto</td>
+              <td>Passiva</td>
+              <td>A pessoa parece não notar estímulos (sons, chamados, dor); pode parecer 'distraída' ou 'no seu mundo'.</td>
+            </tr>
+            <tr>
+              <td><strong>Busca de sensação</strong></td>
+              <td>Alto</td>
+              <td>Ativa</td>
+              <td>Busca ativamente mais estímulo — gosta de movimento intenso, texturas fortes, pressão profunda, sons altos.</td>
+            </tr>
+            <tr>
+              <td><strong>Sensibilidade sensorial</strong></td>
+              <td>Baixo</td>
+              <td>Passiva</td>
+              <td>Percebe tudo intensamente, mas reage de forma mais contida — incômodo silencioso que pode se acumular até o transbordamento.</td>
+            </tr>
+            <tr>
+              <td><strong>Esquiva de sensação</strong></td>
+              <td>Baixo</td>
+              <td>Ativa</td>
+              <td>Percebe o estímulo intensamente e reage ativamente para escapar dele — cobre os ouvidos, evita texturas, recusa alimentos, se afasta.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>3.2 Perfil Cognitivo e de Rotina</h3>
+      <ul>
+        <li><strong>Necessidade de previsibilidade:</strong> rotinas visuais e avisos prévios sobre mudanças reduzem significativamente o sofrimento associado à quebra de expectativas. Isso está alinhado ao critério diagnóstico de 'insistência na mesma coisa/rotinas inflexíveis' descrito no DSM-5-TR (American Psychiatric Association, 2022) — mas, na prática cotidiana, o que importa é entender essa necessidade como uma forma de segurança, não como 'teimosia'.</li>
+        <li><strong>Interesses intensos (hiperfoco):</strong> o uso de interesses restritos como ferramenta de aprendizagem e autorregulação é bem documentado. Interromper abruptamente o hiperfoco tende a gerar ansiedade; integrá-lo ao cotidiano, por outro lado, favorece engajamento e desenvolvimento de habilidades complexas.</li>
+      </ul>
+
+      <h3>3.3 Perfil de Comunicação</h3>
+      <ul>
+        <li><strong>Comunicação verbal com desafios pragmáticos:</strong> fala de forma fluente, mas pode ter dificuldade com ironias, metáforas, ou com o ritmo de alternância entre falar e ouvir.</li>
+        <li><strong>Comunicação não verbal ou por linguagem alternativa:</strong> utiliza gestos, vocalizações ou Sistemas de Comunicação Alternativa e Aumentativa (CAA) — como pranchas de figuras, aplicativos ou dispositivos geradores de fala — para expressar necessidades e desejos complexos. A literatura em CAA (Beukelman & Mirenda, 2013) é clara: a comunicação alternativa não atrasa a fala; pelo contrário, tende a favorecê-la, ao reduzir a frustração comunicativa.</li>
+      </ul>
+    </div>
+
+    <!-- [QUESTIONARIO] Protocolo de Escuta -->
+    <div id="protocolo-escuta" class="article-block">
+      <h2>4. Protocolo de Escuta e Mapeamento Humanizado</h2>
+      <p>As perguntas abaixo servem como roteiro de observação e conversa para famílias, educadores e profissionais entenderem como o indivíduo funciona — sem focar na 'falha', mas na identificação de demandas de suporte. Elas foram organizadas em torno de eixos que dialogam com os domínios avaliados por instrumentos padronizados amplamente usados na prática clínica, como o ADOS-2 e o ADI-R, o M-CHAT-R/F para triagem em primeira infância, e o Perfil Sensorial de Dunn.</p>
+      <p>Este roteiro não é um instrumento diagnóstico. Ele não substitui escalas padronizadas nem uma avaliação formal — serve apenas para estruturar a escuta e orientar a conversa com os profissionais responsáveis pelo acompanhamento.</p>
+      
+      <div class="accordion" id="acc-protocolo-guia">
+        
+        <div class="acc-item">
+          <button class="acc-head" aria-expanded="false">
+            <span>Eixo A — Comunicação e Conexão Humana</span><span class="chev">▾</span>
+          </button>
+          <div class="acc-body"><div class="acc-body-in">
+            <ul style="margin-top: 1em;">
+              <li>Como a pessoa demonstra afeto, satisfação ou desconforto de forma espontânea (mesmo sem palavras)?</li>
+              <li>Quando deseja muito algo, qual é o caminho mais frequente que utiliza para se fazer entender?</li>
+              <li>Como reage quando não é compreendida? Há um padrão de isolamento ou de busca por contato físico nesses momentos?</li>
+              <li>Existe alguma forma de comunicação alternativa (gestos próprios, figuras, aplicativo) já em uso ou que poderia ser explorada?</li>
+            </ul>
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-head" aria-expanded="false">
+            <span>Eixo B — Processamento Sensorial e Regulação Ambiental</span><span class="chev">▾</span>
+          </button>
+          <div class="acc-body"><div class="acc-body-in">
+            <ul style="margin-top: 1em;">
+              <li>Quais estímulos (sons, tipos de luz, texturas de roupa ou de alimento) trazem uma sensação imediata de relaxamento ou prazer?</li>
+              <li>Diante de quais sons, cheiros, luzes ou toques você percebe uma mudança postural imediata (cobrir os ouvidos, piscar em excesso, irritabilidade, congelamento)?</li>
+              <li>Os movimentos repetitivos (balançar as mãos, o corpo, andar em círculos) costumam surgir em momentos de alegria intensa, de estresse, ou quando o ambiente está silencioso ou vazio demais?</li>
+            </ul>
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-head" aria-expanded="false">
+            <span>Eixo C — Flexibilidade Cognitiva e Padrões de Rotina</span><span class="chev">▾</span>
+          </button>
+          <div class="acc-body"><div class="acc-body-in">
+            <ul style="margin-top: 1em;">
+              <li>Como é a reação quando um plano ou trajeto precisa mudar sem aviso prévio? O que ajuda a acalmar nessa transição?</li>
+              <li>Existem objetos, temas ou atividades específicas que capturam a atenção por longos períodos? Como a pessoa reage se for interrompida durante essa atividade?</li>
+              <li>Como as regras do cotidiano ou de jogos são interpretadas? Há uma busca por rigidez/justiça nas regras, ou indiferença a elas?</li>
+            </ul>
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-head" aria-expanded="false">
+            <span>Eixo D — Impacto do Meio Social e Barreiras de Acesso</span><span class="chev">▾</span>
+          </button>
+          <div class="acc-body"><div class="acc-body-in">
+            <ul style="margin-top: 1em;">
+              <li>Quais são, hoje, os maiores obstáculos burocráticos ou sociais que a família enfrenta para garantir as adaptações necessárias (na escola, na saúde, no lazer)?</li>
+              <li>Como o cansaço ou a falta de informação da rede de apoio impacta o manejo diário das crises ou dos momentos de maior necessidade de suporte?</li>
+            </ul>
+          </div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- [ESTRATEGIAS] -->
+    <div id="estrategias" class="article-block">
+      <h2>5. Estratégias Práticas por Perfil</h2>
+      <p>As estratégias abaixo se apoiam em práticas reconhecidas como baseadas em evidências pelo relatório do National Clearinghouse on Autism Evidence and Practice (NCAEP), que identificou 28 práticas com evidência científica consistente de eficácia (Steinbrenner et al., 2020).</p>
+      
+      <div class="grid-2" style="margin-top: 1.5em;">
+        <div class="card strategy-card">
+          <div class="strategy-icon">🎧</div>
+          <div>
+            <h4 style="margin:0 0 8px 0;">Sensibilidade / Esquiva Sensorial</h4>
+            <p style="font-size:0.9rem; margin:0; color:var(--ink-soft);">Redução de danos sensoriais — abafadores de ruído em ambientes públicos, iluminação quente e indireta, respeito à seletividade alimentar temporária enquanto se trabalha, de forma gradual e não forçada, a ampliação do repertório. A integração sensorial (Ayres Sensory Integration®) é uma das práticas com evidência reconhecida pelo NCAEP quando conduzida por terapeuta ocupacional qualificado.</p>
+          </div>
+        </div>
+        <div class="card strategy-card">
+          <div class="strategy-icon">🗓️</div>
+          <div>
+            <h4 style="margin:0 0 8px 0;">Demanda de Previsibilidade</h4>
+            <p style="font-size:0.9rem; margin:0; color:var(--ink-soft);">Rotinas visuais estruturadas (quadros com figuras, agendas escritas) e narrativas sociais — uma prática com evidência consolidada — para antecipar mudanças (ex.: 'Amanhã o médico vai mudar o horário; faremos o caminho B e depois comeremos o lanche que você gosta').</p>
+          </div>
+        </div>
+        <div class="card strategy-card">
+          <div class="strategy-icon">🚂</div>
+          <div>
+            <h4 style="margin:0 0 8px 0;">Uso Construtivo do Hiperfoco</h4>
+            <p style="font-size:0.9rem; margin:0; color:var(--ink-soft);">Usar o tema de interesse como ponte para alfabetização, matemática ou habilidades sociais — se o interesse são trens, usar trens para contar, ler histórias e criar paralelos sobre interação social dentro de uma estação.</p>
+          </div>
+        </div>
+        <div class="card strategy-card">
+          <div class="strategy-icon">📱</div>
+          <div>
+            <h4 style="margin:0 0 8px 0;">Comunicação Não Verbal / Emergente</h4>
+            <p style="font-size:0.9rem; margin:0; color:var(--ink-soft);">Introdução de CAA o quanto antes, sem esperar 'esgotar' tentativas de fala oral — a evidência mostra que isso reduz frustração e favorece o desenvolvimento da comunicação como um todo.</p>
+          </div>
+        </div>
+        <div class="card strategy-card" style="grid-column: 1 / -1;">
+          <div class="strategy-icon">🛡️</div>
+          <div>
+            <h4 style="margin:0 0 8px 0;">Regulação em Momentos de Crise</h4>
+            <p style="font-size:0.9rem; margin:0; color:var(--ink-soft);">Priorizar a identificação de gatilhos (eixo B do protocolo de escuta) e a construção de um plano de regulação combinado previamente com a pessoa, sempre que possível, em vez de intervenções reativas.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- [REFERENCIAS_E_LINKS] -->
+    <div id="referencias" class="article-block">
+      <h2>6. Referências Científicas e Recursos</h2>
+      
+      <div class="ref-category">
+        <h4>6.1 Referências fundamentais</h4>
+        <ul>
+          <li>Singer, J. (1999). 'Why can't you be normal for once in your life?' From a 'problem with no name' to the emergence of a new category of difference. Em M. Corker & S. French (Orgs.), Disability Discourse (pp. 59–67). Open University Press. (baseado na tese de honras de 1998, Universidade de Tecnologia de Sydney, republicada em livro em 2016 como NeuroDiversity: The Birth of an Idea).</li>
+          <li>Botha, M., Chapman, R., Giwa Onaiwu, M., Kapp, S. K., Stannard Ashley, A., & Walker, N. (2024). The neurodiversity concept was developed collectively: An overdue correction on the origins of neurodiversity theory. Autism, 28(6). Revisão que documenta a origem coletiva, dentro da comunidade autista, do conceito de neurodiversidade.</li>
+          <li>Milton, D. E. M. (2012). On the ontological status of autism: The 'double empathy problem'. Disability & Society, 27(6), 883–887.</li>
+          <li>Steinbrenner, J. R., Hume, K., Odom, S. L., Morin, K. L., Nowell, S. W., Tomaszewski, B., Szendrey, S., McIntyre, N. S., Yücesoy-Özkan, Ş., & Savage, M. N. (2020). Evidence-based practices for children, youth, and young adults with autism. University of North Carolina at Chapel Hill, Frank Porter Graham Child Development Institute, National Clearinghouse on Autism Evidence and Practice Review Team.</li>
+          <li>Dunn, W. (1997). The impact of sensory processing abilities on the daily lives of young children and their families: A conceptual model. Infants and Young Children, 9(4), 23–35.</li>
+          <li>Robins, D. L., Casagrande, K., Barton, M., Chen, C., Dumont-Mathieu, T., & Fein, D. (2014). Validation of the Modified Checklist for Autism in Toddlers, Revised with Follow-up (M-CHAT-R/F). Pediatrics, 133(1), 37–45.</li>
+          <li>Beukelman, D. R., & Mirenda, P. (2013). Augmentative and Alternative Communication: Supporting Children and Adults with Complex Communication Needs (4ª ed.). Paul H. Brookes Publishing.</li>
+          <li>American Psychiatric Association. (2022). Diagnostic and Statistical Manual of Mental Disorders (5ª ed., texto revisado; DSM-5-TR).</li>
+        </ul>
+      </div>
+
+      <div class="ref-category">
+        <h4>6.2 Legislação brasileira</h4>
+        <ul>
+          <li>Brasil. Lei nº 12.764, de 27 de dezembro de 2012 ('Lei Berenice Piana'). Institui a Política Nacional de Proteção dos Direitos da Pessoa com Transtorno do Espectro Autista, reconhecendo a pessoa autista como pessoa com deficiência para todos os efeitos legais.</li>
+          <li>Brasil. Decreto nº 8.368, de 2 de dezembro de 2014. Regulamenta a Lei nº 12.764/2012.</li>
+        </ul>
+      </div>
+
+      <div class="ref-category">
+        <h4>6.3 Formações e cursos recomendados</h4>
+        <ul>
+          <li>Práticas Baseadas em Evidências em Autismo (PBE/NCAEP): capacitação voltada a pais, professores e terapeutas para aplicação estruturada das 28 práticas reconhecidas.</li>
+          <li>Comunicação Alternativa e Aumentativa (CAA): formação essencial para garantir o direito de expressão a pessoas não verbais ou com fala pouco funcional.</li>
+          <li>Integração Sensorial (Ayres Sensory Integration®): formação específica para terapeutas ocupacionais que atuam no perfil sensorial.</li>
+          <li>Neurodiversidade e Modelo Social da Deficiência: formações voltadas ao entendimento de direitos humanos, acessibilidade e despatologização — recomenda-se priorizar cursos com autores e formadores autistas.</li>
+        </ul>
+      </div>
+
+      <div class="ref-category">
+        <h4>6.4 Bancos de dados e repositórios para atualização contínua</h4>
+        <ul>
+          <li>Scielo (scielo.br) e Portal de Periódicos CAPES — produção científica em português sobre intervenção precoce e inclusão escolar.</li>
+          <li>PubMed e Google Acadêmico — literatura internacional revisada por pares.</li>
+          <li>Site do NCAEP (ncaep.fpg.unc.edu) — relatório completo de práticas baseadas em evidências, atualizado periodicamente.</li>
+          <li>AFIRM Modules (Autism Focused Intervention Resources and Modules) — módulos práticos gratuitos baseados nas PBEs do NCAEP.</li>
+        </ul>
+      </div>
+
+      <div class="home-note" style="margin-top: 2em;">
+        <strong>Nota:</strong> Este guia deve ser revisado periodicamente à medida que novas evidências científicas surgem. Recomenda-se que qualquer estratégia aqui sugerida seja validada junto à equipe multiprofissional que acompanha a pessoa autista.
+      </div>
+    </div>
+
+  </section>
 </main>
 
 <footer>
@@ -873,12 +1331,17 @@ const StorageHelper = {
 /* ======================= DATA ======================= */
 
 const DOORS = [
-  {tab:'biblioteca', ic:'📚', title:'Biblioteca', desc:'Entenda o "porquê" por trás dos comportamentos, com base em evidências.'},
-  {tab:'comunicacao', ic:'🗣️', title:'Comunicação', desc:'Prancha de símbolos e treino da técnica de modelagem de fala.'},
+ 
+  {tab:'guia', ic:'🧭', title:'Guia Completo', desc:'Mapeamento, protocolo de escuta e estratégias práticas.'},
   {tab:'rotina', ic:'🗓️', title:'Rotina', desc:'Monte um quadro visual Primeiro / Depois para o dia.'},
+  {tab:'alimentacao', ic:'🍎', title:'Alimentação', desc:'Receitas e dicas para lidar com a seletividade alimentar.'},
+  {tab:'atividades', ic:'🧩', title:'Atividades', desc:'Brincadeiras para estimular comunicação e vínculo.'},
+  {tab:'comunicacao', ic:'🗣️', title:'Comunicação', desc:'Prancha de símbolos e treino de modelagem de fala.'},
   {tab:'treinos', ic:'🎯', title:'Treinos', desc:'Módulos passo a passo para praticar com a rede de apoio.'},
-  {tab:'perfil', ic:'🧍', title:'Perfil', desc:'Personalize o app ao nível de suporte e perfil sensorial.'},
+  {tab:'indicacoes', ic:'🤝', title:'Indicações', desc:'Profissionais e clínicas recomendados pela comunidade.'},
+  {tab:'biblioteca', ic:'📚', title:'Biblioteca', desc:'Entenda o "porquê" por trás dos comportamentos.'},
   {tab:'blog', ic:'📝', title:'Blog', desc:'Leituras curtas: alimentação seletiva, telas e estímulos.'},
+  {tab:'perfil', ic:'🧍', title:'Perfil', desc:'Personalize o app ao nível de suporte e perfil sensorial.'}
 ];
 
 const LIBRARY = [
@@ -1390,6 +1853,7 @@ function updateLoginUI() {
     if(formComAlim) formComAlim.style.display = 'flex';
     if(msgComAlim) msgComAlim.style.display = 'none';
     if(btnNovaAtiv) btnNovaAtiv.style.display = 'inline-flex';
+    if(document.getElementById('btn-nova-indicacao')) document.getElementById('btn-nova-indicacao').style.display = 'inline-flex';
     if(formDepo) formDepo.style.display = 'flex';
     if(msgDepo) msgDepo.style.display = 'none';
   } else {
@@ -1404,6 +1868,8 @@ function updateLoginUI() {
     if(btnNovaAtiv) btnNovaAtiv.style.display = 'none';
     if(formDepo) formDepo.style.display = 'none';
     if(msgDepo) msgDepo.style.display = 'block';
+    if(document.getElementById('btn-nova-indicacao')) document.getElementById('btn-nova-indicacao').style.display = 'none';
+if(document.getElementById('form-nova-indicacao')) document.getElementById('form-nova-indicacao').style.display = 'none';
     
     // Esconde formulários se estivessem abertos
     if(document.getElementById('form-nova-receita')) document.getElementById('form-nova-receita').style.display = 'none';
@@ -1804,6 +2270,22 @@ document.getElementById('guide-next').addEventListener('click',()=>{
   if(guideIdx<GUIDE_STEPS.length-1){guideIdx++; renderGuide();}
   else { guideOverlay.classList.remove('open'); }
 });
+/* ======================= ACORDEÕES DO GUIA ======================= */
+document.addEventListener('click', function(e) {
+  // Verifica se o clique foi em um botão de acordeão dentro do Guia
+  const btn = e.target.closest('#acc-protocolo-guia .acc-head');
+  if (btn) {
+    const item = btn.parentElement;
+    const isOpen = item.classList.contains('open');
+    
+    // Abre ou fecha
+    item.classList.toggle('open', !isOpen);
+    btn.setAttribute('aria-expanded', !isOpen);
+  }
+});
+
+/* Adicionando dica do Pip para a nova aba */
+PIP_TIPS['guia'] = 'Este é um guia completo e aprofundado. Use o menu no topo para pular direto para a seção que você precisa ler!';
 </script>
 </body>
 </html>
