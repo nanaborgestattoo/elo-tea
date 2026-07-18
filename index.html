@@ -7,6 +7,7 @@
 <meta name="description" content="Plataforma educativa e prática para cuidadores e rede de apoio de pessoas com TEA: comunicação, rotina, integração sensorial e treinos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
   :root{
     --bg:#FAF7F2;
@@ -603,6 +604,125 @@
   font-size: 0.9rem;
   color: var(--ink-soft);
 }
+/* ... (outros estilos existentes) ... */
+  .ref-category ul {
+    list-style-type: square;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  /* ======================================================= */
+  /* MÓDULO JOGO: CORRIDA DO PIP                             */
+  /* ======================================================= */
+  #pip-game-btn {
+    position: fixed;
+    right: 1.2em;
+    bottom: 6.4em;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--secondary);
+    color: #fff;
+    border: 4px solid #fff;
+    box-shadow: var(--shadow-md);
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 90;
+    transition: transform 0.2s ease, opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #pip-game-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #pip-game-btn:hover, #pip-game-btn:focus-visible {
+    transform: scale(1.05);
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+  }
+  .jogo-box {
+    max-width: 640px;
+    width: 92vw;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .jogo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .jogo-header h2 {
+    font-family: var(--font-display);
+    color: var(--ink);
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  .jogo-placar {
+    font-family: var(--font-body);
+    color: var(--ink);
+    font-size: 1rem;
+    display: flex;
+    gap: 1rem;
+  }
+  .jogo-placar .recorde {
+    color: var(--text-light);
+  }
+  .jogo-canvas-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    max-height: 50vh;
+    background-color: var(--bg);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--line);
+  }
+  #jogo-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  .jogo-fim-tela {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-align: center;
+    backdrop-filter: blur(2px);
+    z-index: 10;
+  }
+  .jogo-fim-tela.hidden {
+    display: none;
+  }
+  .jogo-fim-tela h3 {
+    font-family: var(--font-display);
+    color: var(--primary);
+    margin: 0;
+  }
+  .jogo-instrucoes {
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0;
+  }
+
+</style>
+</head>
+<body>
 </style>
 </head>
 <body>
@@ -646,7 +766,14 @@
       <button class="btn" id="open-guide">🧩 Abrir Guia Rápido</button>
     </div>
 
-    <div class="door-grid" id="door-grid"></div>
+    <div class="door-grid" id="door-grid">
+  <!-- PONTO DE ENTRADA 1: Card na Home -->
+  <button class="door" id="btn-jogo-card" aria-label="Abrir jogo Corrida do Pip">
+    <span class="ic">🎮</span>
+    <h3>Corrida do Pip</h3>
+    <span class="desc">Uma pausa divertida para jogar</span>
+  </button>
+</div>
 
     <div class="home-note">
       💛 Este aplicativo é uma ferramenta educativa e de apoio à rotina. Ele não substitui avaliação, diagnóstico ou acompanhamento de médicos, terapeutas ocupacionais, fonoaudiólogos, psicólogos e demais profissionais especializados. Sempre que possível, construa as estratégias em conjunto com a equipe terapêutica.
@@ -2889,6 +3016,350 @@ if (indFiltros && indGrid && indCatSelect) {
     renderIndicacoes();
   });
 }
+</script>
+
+<!-- ======================================================= -->
+<!-- PONTO DE ENTRADA 2: Botão Fixo (Visível apenas na Home) -->
+<!-- ======================================================= -->
+<button id="pip-game-btn" class="floating-btn" aria-label="Abrir jogo Corrida do Pip" title="Jogar Corrida do Pip">
+  🎮
+</button>
+
+<!-- ======================================================= -->
+<!-- MODAL DO JOGO                                           -->
+<!-- ======================================================= -->
+<div class="modal-overlay" id="jogo-overlay" aria-hidden="true">
+  <div class="modal-box jogo-box" role="dialog" aria-labelledby="jogo-titulo" aria-modal="true">
+    <button class="close-x" id="jogo-close" aria-label="Fechar jogo">✕</button>
+    
+    <div class="jogo-header">
+      <h2 id="jogo-titulo">Corrida do Pip</h2>
+      <div class="jogo-placar">
+        <span>Pontos: <strong id="jogo-pontos">0</strong></span>
+        <span class="recorde">Recorde: <strong id="jogo-recorde">0</strong></span>
+      </div>
+    </div>
+
+    <div class="jogo-canvas-container">
+      <canvas id="jogo-canvas"></canvas>
+      
+      <!-- Tela de Fim de Jogo (Sobreposta ao Canvas) -->
+      <div id="jogo-fim-tela" class="jogo-fim-tela hidden">
+        <h3 id="jogo-mensagem-fim">Pip precisou descansar!</h3>
+        <p>Sua pontuação: <strong id="jogo-pontos-fim">0</strong></p>
+        <button id="jogo-btn-reiniciar" class="btn">Jogar novamente</button>
+      </div>
+    </div>
+
+    <div class="jogo-instrucoes">
+      <p>Pressione <strong>Espaço</strong>, <strong>Seta para Cima</strong> ou <strong>Toque na tela</strong> para pular.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======================================================= */
+/* MÓDULO JOGO: CORRIDA DO PIP (Encapsulado)               */
+/* ======================================================= */
+(function() {
+  const btnFixo = document.getElementById('pip-game-btn');
+  const btnCard = document.getElementById('btn-jogo-card');
+  const overlay = document.getElementById('jogo-overlay');
+  const btnClose = document.getElementById('jogo-close');
+  const canvas = document.getElementById('jogo-canvas');
+  
+  // Se o HTML do modal não estiver na tela, aborta para não dar erro
+  if (!canvas) return; 
+
+  const ctx = canvas.getContext('2d');
+  const elPontos = document.getElementById('jogo-pontos');
+  const elRecorde = document.getElementById('jogo-recorde');
+  const telaFim = document.getElementById('jogo-fim-tela');
+  const pontosFim = document.getElementById('jogo-pontos-fim');
+  const btnReiniciar = document.getElementById('jogo-btn-reiniciar');
+
+  let animationId;
+  let isPlaying = false;
+  let score = 0;
+  let highScore = localStorage.getItem('eloTea:recordeJogo') || 0;
+  let gameSpeed = 0;
+  let frameCount = 0;
+  
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const BASE_SPEED = prefersReducedMotion ? 3.5 : 5;
+  const SPEED_INCREMENT = prefersReducedMotion ? 0.001 : 0.002;
+  const GRAVITY = prefersReducedMotion ? 0.4 : 0.6;
+  const JUMP_STRENGTH = prefersReducedMotion ? 9 : 11;
+
+  let colors = {};
+  function loadColors() {
+    const root = getComputedStyle(document.documentElement);
+    colors = {
+      coral: root.getPropertyValue('--coral').trim() || '#FF6B6B',
+      gold: root.getPropertyValue('--gold').trim() || '#FFD166',
+      teal: root.getPropertyValue('--teal').trim() || '#06D6A0',
+      violet: root.getPropertyValue('--violet').trim() || '#8338EC',
+      bg: root.getPropertyValue('--bg').trim() || '#F8F9FA',
+      line: root.getPropertyValue('--line').trim() || '#E9ECEF',
+      ink: root.getPropertyValue('--ink').trim() || '#212529'
+    };
+  }
+
+  const pip = {
+    x: 50, y: 0, size: 40, vy: 0, isJumping: false,
+    draw() {
+      const r = this.size / 2;
+      const cx = this.x + r;
+      const cy = this.y + r;
+      let grad;
+      if (ctx.createConicGradient) {
+        grad = ctx.createConicGradient(0, cx, cy);
+      } else {
+        grad = ctx.createLinearGradient(this.x, this.y, this.x + this.size, this.y + this.size);
+      }
+      grad.addColorStop(0, colors.coral);
+      grad.addColorStop(0.33, colors.gold);
+      grad.addColorStop(0.66, colors.teal);
+      grad.addColorStop(1, colors.violet);
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      ctx.fillStyle = colors.ink;
+      ctx.beginPath();
+      ctx.arc(cx + r * 0.3, cy - r * 0.2, r * 0.15, 0, Math.PI * 2);
+      ctx.arc(cx + r * 0.7, cy - r * 0.2, r * 0.15, 0, Math.PI * 2);
+      ctx.fill();
+    },
+    jump() {
+      if (!this.isJumping) {
+        this.vy = -JUMP_STRENGTH;
+        this.isJumping = true;
+      }
+    },
+    update(floorY) {
+      this.vy += GRAVITY;
+      this.y += this.vy;
+      if (this.y + this.size >= floorY) {
+        this.y = floorY - this.size;
+        this.vy = 0;
+        this.isJumping = false;
+      }
+    }
+  };
+
+  let obstacles = [];
+  let clouds = [];
+
+  function spawnObstacle() {
+    const size = 30 + Math.random() * 15;
+    obstacles.push({
+      x: canvas.width,
+      y: canvas.height - 30 - size,
+      w: size,
+      h: size
+    });
+  }
+
+  function spawnCloud() {
+    clouds.push({
+      x: canvas.width,
+      y: Math.random() * (canvas.height / 2),
+      size: 20 + Math.random() * 20,
+      speed: (Math.random() * 0.5 + 0.2) * (prefersReducedMotion ? 0.5 : 1)
+    });
+  }
+
+  function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    pip.size = Math.max(30, canvas.height * 0.15);
+    pip.x = canvas.width * 0.1;
+  }
+
+  function resetGame() {
+    resizeCanvas();
+    loadColors();
+    score = 0;
+    gameSpeed = BASE_SPEED;
+    frameCount = 0;
+    obstacles = [];
+    clouds = [];
+    pip.y = canvas.height - 30 - pip.size;
+    pip.vy = 0;
+    pip.isJumping = false;
+    
+    elPontos.innerText = '0';
+    elRecorde.innerText = Math.floor(highScore);
+    telaFim.classList.add('hidden');
+    
+    isPlaying = true;
+    loop();
+  }
+
+  function gameOver() {
+    isPlaying = false;
+    cancelAnimationFrame(animationId);
+    if (score > highScore) {
+      highScore = score;
+      localStorage.setItem('eloTea:recordeJogo', highScore);
+    }
+    pontosFim.innerText = Math.floor(score);
+    telaFim.classList.remove('hidden');
+  }
+
+  function update() {
+    gameSpeed += SPEED_INCREMENT;
+    frameCount++;
+    score += gameSpeed * 0.01;
+    elPontos.innerText = Math.floor(score);
+
+    const floorY = canvas.height - 30;
+    pip.update(floorY);
+
+    if (frameCount % 150 === 0) spawnCloud();
+    clouds.forEach(c => c.x -= c.speed);
+    clouds = clouds.filter(c => c.x + c.size > 0);
+
+    const spawnRate = Math.max(60, 120 - Math.floor(gameSpeed * 5)); 
+    if (frameCount % spawnRate === 0) spawnObstacle();
+
+    obstacles.forEach(obs => {
+      obs.x -= gameSpeed;
+      const tol = 5;
+      if (
+        pip.x + tol < obs.x + obs.w &&
+        pip.x + pip.size - tol > obs.x &&
+        pip.y + tol < obs.y + obs.h &&
+        pip.y + pip.size - tol > obs.y
+      ) {
+        gameOver();
+      }
+    });
+    obstacles = obstacles.filter(obs => obs.x + obs.w > 0);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const floorY = canvas.height - 30;
+    
+    ctx.fillStyle = colors.line;
+    ctx.fillRect(0, floorY, canvas.width, 30);
+    
+    ctx.beginPath();
+    ctx.setLineDash([10, 15]);
+    ctx.moveTo(0, floorY + 10);
+    ctx.lineTo(canvas.width, floorY + 10);
+    ctx.strokeStyle = colors.ink;
+    ctx.globalAlpha = 0.1;
+    ctx.stroke();
+    ctx.globalAlpha = 1.0;
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = colors.line;
+    ctx.globalAlpha = 0.5;
+    clouds.forEach(c => {
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+      ctx.arc(c.x + c.size * 0.8, c.y - c.size * 0.3, c.size * 0.8, 0, Math.PI * 2);
+      ctx.arc(c.x + c.size * 1.6, c.y, c.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1.0;
+
+    ctx.fillStyle = colors.teal;
+    obstacles.forEach(obs => {
+      ctx.beginPath();
+      ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 8);
+      ctx.fill();
+    });
+
+    pip.draw();
+  }
+
+  function loop() {
+    if (!isPlaying) return;
+    update();
+    draw();
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function handleJump(e) {
+    if (!isPlaying) return;
+    if (e.type === 'keydown' && (e.code === 'Space' || e.code === 'ArrowUp')) {
+      e.preventDefault();
+      pip.jump();
+    } else if (e.type === 'touchstart' || e.type === 'mousedown') {
+      e.preventDefault();
+      pip.jump();
+    }
+  }
+
+  window.addEventListener('keydown', handleJump);
+  canvas.addEventListener('touchstart', handleJump, { passive: false });
+  canvas.addEventListener('mousedown', handleJump);
+
+  function openGame() {
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    setTimeout(() => resetGame(), 50);
+  }
+
+  function closeGame() {
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+    isPlaying = false;
+    cancelAnimationFrame(animationId);
+  }
+
+  if (btnFixo) btnFixo.addEventListener('click', openGame);
+  if (btnCard) btnCard.addEventListener('click', openGame);
+  if (btnReiniciar) btnReiniciar.addEventListener('click', resetGame);
+  if (btnClose) btnClose.addEventListener('click', closeGame);
+  
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeGame();
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeGame();
+  });
+  window.addEventListener('blur', () => {
+    if (isPlaying) gameOver();
+  });
+  window.addEventListener('resize', () => {
+    if (overlay.classList.contains('open')) {
+      resizeCanvas();
+      draw();
+    }
+  });
+
+  function checkHomeVisibility() {
+    const homeView = document.getElementById('view-home');
+    if (homeView && homeView.classList.contains('active')) {
+      if(btnFixo) btnFixo.classList.add('visible');
+    } else {
+      if(btnFixo) btnFixo.classList.remove('visible');
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-item') || e.target.closest('button')) {
+      setTimeout(checkHomeVisibility, 50);
+    }
+  });
+  setTimeout(checkHomeVisibility, 100);
+
+})();
+
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
